@@ -21,7 +21,7 @@
 |---|---|---|
 | 1.0 | Введение: как работать с продуктовыми метриками | [1_0_intro.md](1_0_intro.md) |
 | 1.1 | DAU / WAU / MAU — метрики аудитории | [1_1_dau_wau_mau.md](1_1_dau_wau_mau.md) |
-| 1.2 | Retention и Aha-moment | [1_2_retention.md](1_2_retention.md) |
+| 1.2 | Retention, PMF и Aha-moment | [1_2_retention.md](1_2_retention.md) |
 | 1.3 | Практика: Retention | [1_3_practice_retention.md](1_3_practice_retention.md) |
 | 1.4 | Конверсия и воронки | [1_4_conversion_funnels.md](1_4_conversion_funnels.md) |
 | 1.5 | Практика: Воронки | [1_5_practice_funnels.md](1_5_practice_funnels.md) |
