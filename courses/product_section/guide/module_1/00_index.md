@@ -30,6 +30,7 @@
 | 1.8 | Практика: Монетизация | [1_8_practice_monetization.md](1_8_practice_monetization.md) |
 | 1.9 | Unit-экономика | [1_9_unit_economics.md](1_9_unit_economics.md) |
 | 1.10 | Практика: Unit-экономика | [1_10_practice_unit.md](1_10_practice_unit.md) |
+| 1.10b | AARRR и North Star Metric | [1_10b_aarrr.md](1_10b_aarrr.md) |
 
 ★ | Метрики качества поиска и рекомендаций | [1_6b_search_recs.md](1_6b_search_recs.md) |
 
