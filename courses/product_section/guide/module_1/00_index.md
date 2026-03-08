@@ -20,6 +20,8 @@
 | # | Тема | Файл |
 |---|---|---|
 | 1.0 | Введение: как работать с продуктовыми метриками | [1_0_intro.md](1_0_intro.md) |
+| 1.0b | Бизнес-модель и стадия продукта | [1_0b_business_model.md](1_0b_business_model.md) |
+| 1.0c | Конкуренты | [1_0c_competitors.md](1_0c_competitors.md) |
 | 1.1 | DAU / WAU / MAU — метрики аудитории | [1_1_dau_wau_mau.md](1_1_dau_wau_mau.md) |
 | 1.1b | Из чего складывается DAU | [1_1b_dau_growth_model.md](1_1b_dau_growth_model.md) |
 | 1.2 | Retention, PMF и Aha-moment | [1_2_retention.md](1_2_retention.md) |
@@ -29,6 +31,7 @@
 | 1.6 | Метрики монетизации | [1_6_monetization.md](1_6_monetization.md) |
 | 1.7 | Дерево продуктовых метрик | [1_7_metrics_tree.md](1_7_metrics_tree.md) |
 | 1.7b | Оценка потенциала фичи (Feature Sizing) | [1_7b_feature_sizing.md](1_7b_feature_sizing.md) |
+| 1.7c | Приоритизация гипотез (RICE) | [1_7c_prioritization.md](1_7c_prioritization.md) |
 | 1.8 | Практика: Монетизация | [1_8_practice_monetization.md](1_8_practice_monetization.md) |
 | 1.9 | Unit-экономика | [1_9_unit_economics.md](1_9_unit_economics.md) |
 | 1.10 | Практика: Unit-экономика | [1_10_practice_unit.md](1_10_practice_unit.md) |
@@ -49,6 +52,7 @@
 | 1.11b | Прогноз аудитории | [1_11b_audience_forecast.md](1_11b_audience_forecast.md) |
 | 1.13 | Среднее vs медиана | [1_13_mean_vs_median.md](1_13_mean_vs_median.md) |
 | 1.14 | Корреляция ≠ причинность | [1_14_correlation.md](1_14_correlation.md) |
+| 1.14b | Прокси-метрики | [1_14b_proxy_metrics.md](1_14b_proxy_metrics.md) |
 | 1.15 | Парадокс Симпсона | [1_15_simpsons_paradox.md](1_15_simpsons_paradox.md) |
 
 ★ | Статистическая гигиена | [1_15_statistical_hygiene.md](1_15_statistical_hygiene.md) |

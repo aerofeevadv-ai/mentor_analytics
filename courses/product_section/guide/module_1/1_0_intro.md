@@ -99,4 +99,4 @@ pandas      →  .nunique()
 
 ---
 
-➡️ **Дальше:** [1.1 DAU / WAU / MAU](1_1_dau_wau_mau.md)
+➡️ **Дальше:** [1.0b Бизнес-модель и стадия продукта](1_0b_business_model.md)
