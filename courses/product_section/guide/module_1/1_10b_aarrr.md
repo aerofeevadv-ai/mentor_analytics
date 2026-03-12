@@ -31,8 +31,8 @@
 | Acquisition | Новые пользователи, CAC, источники трафика |
 | Activation | D1 retention, Aha-moment, activation rate |
 | Retention | D7 / D30 retention, DAU/MAU ratio, плато |
-| Revenue | ARPU, LTV, GMV, конверсия в оплату, ROAS |
-| Referral | NPS, K-factor, доля реферального трафика |
+| Revenue | ARPU, LTV, GMV, конверсия в оплату, ROAS (Return on Ad Spend — выручка на рубль рекламы) |
+| Referral | NPS (Net Promoter Score — индекс лояльности: «Порекомендуете ли продукт?» по шкале 0–10), K-factor, доля реферального трафика |
 
 > ⚠️ **Типичная ошибка:** Смешивать Acquisition и Activation. Acquisition — пользователь пришёл (установил, зарегистрировался). Activation — пользователь получил первую ценность. Это разные моменты, и метрики у них разные.
 
