@@ -31,6 +31,10 @@ content/youtube/
 ├── ideas.md                   ← пул идей для новых видео
 ├── oauth_setup_instruction.md ← инструкция по настройке OAuth
 ├── thumbnails/                ← скачанные текущие обложки (video_id.jpg)
+│   └── TZ_redesign.md        ← ТЗ на редизайн 3 обложек (2 варианта каждая)
+├── references/                ← 75 референсов обложек IT-каналов
+│   ├── REFERENCES.md          ← анализ паттернов + A/B данные + рекомендации
+│   └── references_meta.json   ← метаданные (канал, views, VPD)
 └── My foto/                   ← фото Алексея для обложек (~40 шт)
 
 scripts/
@@ -44,6 +48,7 @@ scripts/
 
 .claude/skills/
 ├── youtube-thumbnails/SKILL.md  ← skill «Создание обложек с высоким CTR»
+├── review-thumbnails/SKILL.md   ← skill «Ревью вариантов обложек»
 └── youtube-comments/
     ├── SKILL.md                 ← skill «Разбор комментариев YouTube»
     └── scripts/fetch_comments.py
@@ -77,6 +82,20 @@ outputs/images/
 - Нужна новая обложка — вызвать `/youtube-thumbnails`, описать видео
 - Нужно улучшить существующую обложку — вызвать с ID видео
 - Нужен заголовок — вызвать с темой видео
+
+### `/review-thumbnails` — Ревью вариантов обложек
+
+**Файл:** `.claude/skills/review-thumbnails/SKILL.md`
+
+Что внутри:
+- 7 критериев оценки с весами (текст, мобильность, контраст, эмоция, фокус, пара с заголовком, формула)
+- Красные флаги (антипаттерны, убивающие CTR)
+- Доказательная база из A/B тестов (Malewicz, Ali Abdaal, TubeBuddy 1.2M видео)
+- Шаблон ответа с таблицей оценок и рекомендацией для A/B теста
+
+Когда использовать:
+- Есть 2-3 варианта обложки → `/review-thumbnails` — Claude оценит и выберет лучший
+- После генерации обложек в Canva/Figma — проверить перед публикацией
 
 ### `/youtube-comments` — Комментарии
 
