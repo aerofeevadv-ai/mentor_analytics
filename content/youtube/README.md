@@ -29,13 +29,25 @@ content/youtube/
 ├── comments_log.md            ← лог разборов комментариев
 ├── comment_drafts.md          ← черновики ответов
 ├── ideas.md                   ← пул идей для новых видео
+├── ideas/                     ← структурированные идеи (файлы по темам)
 ├── oauth_setup_instruction.md ← инструкция по настройке OAuth
 ├── thumbnails/                ← скачанные текущие обложки (video_id.jpg)
 │   └── TZ_redesign.md        ← ТЗ на редизайн 3 обложек (2 варианта каждая)
 ├── references/                ← 75 референсов обложек IT-каналов
 │   ├── REFERENCES.md          ← анализ паттернов + A/B данные + рекомендации
 │   └── references_meta.json   ← метаданные (канал, views, VPD)
-└── My foto/                   ← фото Алексея для обложек (~40 шт)
+├── My foto/                   ← фото Алексея для обложек (~40 шт)
+│
+└── productions/               ← готовые видео-пакеты
+    └── [slug-темы]/
+        ├── brief.md              ← бриф видео (шаг 3)
+        ├── script.md             ← сценарий для телесуфлёра (шаг 4)
+        ├── editing_brief.md      ← ТЗ монтажёру, покадровый план (шаг 5)
+        ├── thumbnail_brief.md    ← ТЗ на обложку (шаг 6a)
+        ├── seo.md                ← заголовки + описание + теги (шаг 6b)
+        ├── shorts_brief.md       ← посекундный разбор shorts (шаг 6c)
+        └── refs/                 ← транскрипты референсов
+            └── ref_01.md
 
 scripts/
 ├── youtube_auth.py            ← OAuth авторизация
@@ -44,11 +56,13 @@ scripts/
 ├── youtube_ctr_audit.py       ← скачивание данных + обложек
 ├── youtube_comments_to_sheets.py  ← комментарии → Google Sheets
 ├── youtube_post_replies.py    ← публикация ответов из Sheets
-└── generate_image.py          ← генерация изображений (Polza.ai / Gemini Flash)
+├── generate_image.py          ← генерация изображений (Polza.ai / Gemini Flash)
+└── export_pdf.py              ← конвертация MD → PDF (pandoc)
 
 .claude/skills/
 ├── youtube-thumbnails/SKILL.md  ← skill «Создание обложек с высоким CTR»
 ├── review-thumbnails/SKILL.md   ← skill «Ревью вариантов обложек»
+├── youtube-scripts/SKILL.md     ← skill «Полный продакшн-пакет видео»
 └── youtube-comments/
     ├── SKILL.md                 ← skill «Разбор комментариев YouTube»
     └── scripts/fetch_comments.py
