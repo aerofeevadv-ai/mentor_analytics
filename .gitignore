@@ -3,6 +3,21 @@
 .claude/
 !.claude/skills/
 .secrets/
+.env
+
+# Бинарные и тяжелые файлы
+*.pdf
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.mp4
+*.mov
+*.zip
+*.xlsx
+*.docx
+
+# YouTube медиа
 content/youtube/My foto/
 content/youtube/references/*.jpg
 content/youtube/thumbnails/*.jpg

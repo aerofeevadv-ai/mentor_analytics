@@ -64,6 +64,8 @@ pip install -r requirements.txt
 
 - [`CLAUDE.md`](/Users/aleksejerofeev/mentor_analytics/CLAUDE.md) - корневой контекст проекта
 - [`AGENTS.md`](/Users/aleksejerofeev/mentor_analytics/AGENTS.md) - инструкция для AI-агентов и исполнителей
+- [`STATUS.md`](/Users/aleksejerofeev/mentor_analytics/STATUS.md) - быстрый снимок текущего состояния репозитория
+- [`WORKFLOWS.md`](/Users/aleksejerofeev/mentor_analytics/WORKFLOWS.md) - короткие сценарии типовой работы
 - [`requirements.txt`](/Users/aleksejerofeev/mentor_analytics/requirements.txt) - Python-зависимости для `scripts/`
 - [`.env.example`](/Users/aleksejerofeev/mentor_analytics/.env.example) - шаблон локального окружения
 - [`Makefile`](/Users/aleksejerofeev/mentor_analytics/Makefile) - быстрые команды для локальной работы
