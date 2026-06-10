@@ -4,6 +4,13 @@
 !.claude/skills/
 .secrets/
 .env
+.venv/
+venv/
+__pycache__/
+**/__pycache__/
+node_modules/
+dist/
+build/
 
 # Бинарные и тяжелые файлы
 *.pdf
@@ -14,11 +21,22 @@
 *.mp4
 *.mov
 *.zip
+*.rar
 *.xlsx
 *.docx
+*.parquet
+*.csv
+!ops/*.csv
 
 # YouTube медиа
 content/youtube/My foto/
 content/youtube/references/*.jpg
 content/youtube/thumbnails/*.jpg
 content/youtube/productions/*/pdf/
+
+# Генерируемые артефакты
+outputs/
+results/
+
+# Сгенерированные датасеты курса Python (воспроизводятся generate_datasets.py)
+courses/python/datasets/csv/
