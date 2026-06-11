@@ -1,8 +1,9 @@
 """
 Генератор синтетических датасетов для курса «Python + Pandas для аналитиков 20/80».
 
-Создаёт 7 CSV в папке csv/:
-  data.csv        — тренировочный (модуль 2)
+Создаёт 8 CSV в папке csv/:
+  data.csv        — тренировочный (модуль 2): user_id, демография, segment,
+                    signup_date; пропуски, грязные строки, дубли
   orders.csv      — E-commerce: заказы (модули 3.2, 3.3, 3.8)
   users.csv       — E-commerce: пользователи
   products.csv    — Маркетплейс: товары (3.4)
@@ -69,6 +70,28 @@ def gen_training(n=500):
     df["salary"] = punch_holes(df["salary"], 0.12)
     df["email"] = punch_holes(df["email"], 0.08)
     df["city"] = dirty_strings(df["city"], 0.1)
+
+    # --- Новые поля для практик модуля 2 (B3, B4, B6, B7) ---
+    # ВАЖНО: отдельный независимый RNG. Глобальный rng выше уже потреблён
+    # ровно так же, как в первой версии генератора, поэтому остальные
+    # датасеты (orders, users, ...) остаются побайтово неизменными.
+    rng_extra = np.random.default_rng(SEED + 777)
+    df.insert(0, "user_id", np.arange(1, n + 1))
+    df["segment"] = rng_extra.choice(["new", "active", "vip"], n, p=[0.5, 0.35, 0.15])
+    df["signup_date"] = pd.to_datetime("2024-01-01") + pd.to_timedelta(
+        rng_extra.integers(0, 700, n), unit="D")
+    # Немного пропусков в city (~4%) — практики B4 (groupby теряет NaN-ключи) и B6
+    city_holes = rng_extra.choice(df.index, size=20, replace=False)
+    df.loc[city_holes, "city"] = np.nan
+    # 10 полных дублей строк (практика B7: duplicated / drop_duplicates)
+    full_dups = df.sample(10, random_state=SEED)
+    # 8 дублей user_id с более поздней signup_date
+    # (практика B7: «оставь запись с максимальной датой»)
+    key_dups = df.sample(8, random_state=SEED + 1).copy()
+    key_dups["signup_date"] += pd.to_timedelta(rng_extra.integers(30, 300, 8), unit="D")
+    df = pd.concat([df, full_dups, key_dups], ignore_index=True)
+    df = df.sample(frac=1, random_state=SEED).reset_index(drop=True)
+
     df.to_csv(OUT / "data.csv", index=False)
     return df
 

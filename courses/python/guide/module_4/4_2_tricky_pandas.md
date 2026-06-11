@@ -24,16 +24,48 @@ users = users.drop_duplicates(subset=["user_id"])   # лечение (осозн
 
 ---
 
-## 2. NaN не равен сам себе
+## 2. None, NaN и почему `== None` не работает
 
 Что вернёт `df[df["city"] == None]` и как правильно найти строки с пропуском?
 
 <details>
 <summary>Разбор</summary>
 
-Вернёт пустой DataFrame, даже если пропусков полно: сравнение с NaN всегда False, `np.nan == np.nan` → False. Единственный правильный способ — `df[df["city"].isna()]`.
+Вернёт пустой DataFrame — даже если в колонке полно пропусков. Разберёмся почему, потому что здесь две разные вещи:
 
-Бонусный вопрос того же рода: почему `(df["a"] != df["b"])` считает «разными» две ячейки, в которых обе NaN.
+**None vs NaN в pandas**
+
+В Python `None == None` → `True` (это работает). Но pandas при создании колонки object-типа конвертирует `None` в `NaN` либо хранит как Python-объект. В обоих случаях `== None` не срабатывает:
+
+```python
+import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({"city": ["Moscow", None, np.nan, "SPB"]})
+
+df["city"] == None   # [False, False, False, False] — все False!
+df["city"].isna()    # [False, True,  True,  False] — правильно
+```
+
+Почему `== None` даёт `False` даже для `None`-строк? Потому что pandas применяет vectorized-сравнение через numpy, где операция `array == None` реализована как элементное `__eq__`, а не питонный `is` или `==` объекта. Numpy возвращает `False` для любого сравнения с `None` в object-массиве.
+
+**Отдельно про `np.nan == np.nan`**
+
+По стандарту IEEE 754 NaN не равен сам себе:
+```python
+np.nan == np.nan   # False
+np.nan is np.nan   # True — это один объект, но по значению не равен
+```
+
+Поэтому `df["city"] == np.nan` тоже всегда даёт `False`.
+
+**Правильный способ во всех случаях** — `isna()`:
+
+```python
+df[df["city"].isna()]     # ловит и None, и NaN, и pd.NA
+```
+
+**Бонусный вопрос:** почему `df["a"] != df["b"]` считает «разными» две ячейки, в которых обе NaN? По той же причине: `NaN != NaN` → `True`. Для сравнения двух колонок с учётом NaN используй `df["a"].equals(df["b"])` или `df[["a","b"]].isna().all(axis=1)`.
 
 </details>
 

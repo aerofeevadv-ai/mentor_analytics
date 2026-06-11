@@ -69,19 +69,23 @@ orders = pd.read_csv("orders.csv")
 orders.shape
 orders.head()
 orders.info()
+# 📌 Проверь себя: (5100, 9)
 
 # 2
 orders.describe()
 # подозрительное: отрицательная price / нулевой quantity — найди в min
+# 📌 Проверь себя: min price = -59541, min quantity = 0
 
 # 3
 orders[(orders["city"] == "Moscow") & (orders["price"] > 5000)]
+# 📌 Проверь себя: 665 строк
 
 # 4
 orders[
     orders["category"].isin(["electronics", "books"])
     & (orders["status"] != "cancelled")
 ]
+# 📌 Проверь себя: 1427 строк
 
 # 5
 orders["revenue"] = orders["price"] * orders["quantity"]
@@ -89,6 +93,7 @@ orders["revenue"] = orders["price"] * orders["quantity"]
 # 6
 orders["category"].value_counts(dropna=False)
 orders["category"].value_counts(normalize=True, dropna=False)
+# 📌 Проверь себя: топ — sport (862), пропусков 155
 
 # 7
 orders.groupby("city").agg(
@@ -96,40 +101,49 @@ orders.groupby("city").agg(
     orders_cnt=("order_id", "count"),
     buyers=("user_id", "nunique"),
 )
+# 📌 Проверь себя: 19 строк — city ещё грязный, чистка будет в задаче 17
 
 # 8
 orders.pivot_table(index="category", columns="city",
                    values="revenue", aggfunc="mean")
+# 📌 Проверь себя: electronics × Moscow ≈ 26 451
 
 # 9
 users = pd.read_csv("users.csv")
 print(orders.shape)
 merged = orders.merge(users[["user_id", "segment"]], on="user_id", how="left")
 print(merged.shape)   # строк столько же — дублей ключа нет
+# 📌 Проверь себя: (5100, 10) → (5100, 11)
 
 # 10
 merged.groupby("segment", dropna=False)["revenue"].sum()
+# 📌 Проверь себя: у заказов без сегмента (NaN) ≈ 3 576 054
 
 # 11
 orders.isna().sum()
+# 📌 Проверь себя: user_id 103, category 155, promo_code 3309
 
 # 12
 orders["promo_code"] = orders["promo_code"].fillna("no_promo")
 orders = orders.dropna(subset=["user_id"])
 # заказ без user_id нельзя привязать ни к какой метрике пользователя
+# 📌 Проверь себя: осталось 4997 строк
 
 # 13
 orders.duplicated().sum()
 orders[orders.duplicated(keep=False)]
 orders = orders.drop_duplicates()
+# 📌 Проверь себя: 58 дублей, осталось 4939 строк
 
 # 14
 orders.duplicated(subset=["order_id"]).sum()
 orders = (orders.sort_values("order_date")
                 .drop_duplicates(subset=["order_id"], keep="last"))
+# 📌 Проверь себя: 39 дублей, осталось 4900 строк
 
 # 15
 orders.sort_values("revenue", ascending=False).head(10)
+# 📌 Проверь себя: максимальная выручка заказа 161 055
 
 # 16
 orders.sort_values(["city", "order_date"], ascending=[True, False])
@@ -138,9 +152,11 @@ orders.sort_values(["city", "order_date"], ascending=[True, False])
 orders["city"].nunique()
 orders["city"] = orders["city"].str.strip().str.lower()
 orders["city"].nunique()
+# 📌 Проверь себя: 19 → 5
 
 # 18
 orders[orders["category"].str.contains("electro", case=False, na=False)]
+# 📌 Проверь себя: 776 строк
 
 # 19
 orders.to_csv("orders_clean.csv", index=False)
@@ -148,6 +164,7 @@ orders.to_csv("orders_clean.csv", index=False)
 # 20
 check = pd.read_csv("orders_clean.csv")
 check.shape == orders.shape
+# 📌 Проверь себя: (4900, 10), True
 ```
 
 </details>

@@ -50,6 +50,28 @@ df["price"] = pd.to_numeric(df["price"], errors="coerce")   # что не чис
 
 ---
 
+## Даты: pd.to_datetime + аксессор .dt
+
+**Что делает:** `pd.to_datetime()` преобразует строку в тип datetime, после чего через `.dt` доступны год, месяц, день, день недели и т. д.
+
+```python
+df["signup_date"] = pd.to_datetime(df["signup_date"])
+
+df["signup_date"].dt.year        # год
+df["signup_date"].dt.month       # номер месяца
+df["signup_date"].dt.date        # только дата (без времени)
+df["signup_date"].dt.dayofweek   # день недели: 0 = понедельник
+
+# группировка по месяцу регистрации
+df.groupby(df["signup_date"].dt.to_period("M")).size()
+```
+
+**SQL:** `EXTRACT(YEAR FROM signup_date)`, `DATE_TRUNC('month', signup_date)`
+
+📌 **Форвард-ссылка:** полная практика с датами — в [модуле 3 (логистика)](../module_3/00_index.md), здесь только база.
+
+---
+
 ## replace() — замена значений
 
 **Что делает:** заменяет значения по словарю.
@@ -69,26 +91,26 @@ df["city"] = df["city"].replace({"Мск": "Moscow", "Питер": "SPB"})
 **Что делает:** считает, сколько раз встречается каждое значение. Один из самых используемых методов вообще.
 
 ```python
-df["city"].value_counts()
-# Moscow    520
-# SPB       310
-# Kazan      95
+df["segment"].value_counts()
+# new       256
+# active    189
+# vip        73
 ```
 
-**SQL:** `SELECT city, COUNT(*) FROM t GROUP BY city ORDER BY 2 DESC`
+**SQL:** `SELECT segment, COUNT(*) FROM t GROUP BY segment ORDER BY 2 DESC`
 
 **Чуть сложнее:**
 
 ```python
-df["city"].value_counts(normalize=True)   # доли вместо счётчиков
-df["city"].value_counts(dropna=False)     # показать и NaN
+df["segment"].value_counts(normalize=True)   # доли вместо счётчиков
+df["city"].value_counts(dropna=False)        # показать и NaN
 ```
 
 > ⚠️ **Подводный камень:** по умолчанию value_counts ПРЯЧЕТ пропуски. Колонка может быть наполовину пустой, а распределение выглядит красиво. Диагностируешь данные — всегда `dropna=False`.
 
 ---
 
-## apply() — функция к колонке ★
+## apply() — функция к колонке
 
 **Что делает:** применяет твою функцию к каждому значению.
 
@@ -104,32 +126,68 @@ df["price_clean"] = df["price"].apply(normalize_price)
 **Чуть сложнее:** с lambda для коротких преобразований:
 
 ```python
-df["price_category"] = df["price"].apply(lambda x: "high" if x > 1000 else "low")
+df["age_group"] = df["age"].apply(lambda x: "35+" if x >= 35 else ("18-35" if x >= 18 else "18-"))
 ```
+
+**SQL:** `CASE WHEN age >= 35 THEN '35+' WHEN age >= 18 THEN '18-35' ELSE '18-' END`
 
 **Подводный камень:** apply — это скрытый цикл, он медленный. Если существует векторный способ (арифметика, str-методы, replace) — используй его. apply — когда логика действительно нестандартная.
 
 ---
 
-## map() — маппинг по словарю ★
+## map() — маппинг по словарю
 
 **Что делает:** заменяет значения Series по словарю или функции.
 
 ```python
-city_codes = {"Moscow": 77, "SPB": 78}
-df["city_code"] = df["city"].map(city_codes)
+# Маппинг город → код региона (справочник региональных кодов)
+city_to_region = {"Moscow": 77, "SPB": 78, "Kazan": 16, "Novosibirsk": 54, "Ekaterinburg": 66}
+df["region_code"] = df["city"].map(city_to_region)
 ```
 
 **SQL:** JOIN со справочником в миниатюре.
 
-**Подводный камень:** значения, которых нет в словаре, станут NaN (replace в той же ситуации оставил бы оригинал). Это и фича, и ловушка.
+**Подводный камень:** значения, которых нет в словаре, станут NaN (replace в той же ситуации оставил бы оригинал). В `data.csv` в `city` есть «грязные» варианты (`MOSCOW`, `moscow`, ` Moscow`) — они не попадут в маппинг и станут NaN. Это и фича, и ловушка: NaN-ы видно явно, а не спрятаны под «неправильными» значениями.
 
 ---
 
 ## 🧠 Как этим пользуется профи
 
-Получил новую таблицу → `value_counts(dropna=False)` по ключевым категориям → починил типы astype/to_numeric → унифицировал категории replace/map. Только потом метрики.
+Получил новую таблицу → `value_counts(dropna=False)` по ключевым категориям → починил типы astype/to_numeric → конвертировал даты pd.to_datetime → унифицировал категории replace/map. Только потом метрики.
 
-🎯 **Практика:** в тренировочном датасете: 1) приведи имена колонок к нижнему регистру; 2) посчитай распределение городов с долями и с учётом NaN; 3) создай колонку `age_group` («18−», «18–35», «35+») через apply; 4) замени коды городов на названия через map.
+🎯 **Практика:** в `data.csv`: 1) приведи имена колонок к нижнему регистру; 2) посчитай распределение городов с долями и с учётом NaN — обрати внимание на «грязные» варианты (`MOSCOW`, ` Moscow` и т. д.); 3) создай колонку `age_group` («18−», «18–35», «35+») через apply с lambda; 4) создай колонку `region_code`, смапив `city` на коды регионов через словарь — посмотри, сколько строк получили NaN и почему; 5) конвертируй `signup_date` в datetime и выведи месяц регистрации.
+
+<details>
+<summary>✅ Решение</summary>
+
+```python
+import pandas as pd
+df = pd.read_csv("data.csv")
+
+# 1. Нижний регистр колонок
+df.columns = df.columns.str.lower().str.strip()
+
+# 2. Распределение городов с NaN и долями
+df["city"].value_counts(dropna=False)
+df["city"].value_counts(normalize=True, dropna=False)
+
+# 3. age_group через apply
+df["age_group"] = df["age"].apply(
+    lambda x: "35+" if x >= 35 else ("18-35" if x >= 18 else "18-")
+    if pd.notna(x) else None
+)
+
+# 4. region_code через map
+city_to_region = {"Moscow": 77, "SPB": 78, "Kazan": 16, "Novosibirsk": 54, "Ekaterinburg": 66}
+df["region_code"] = df["city"].map(city_to_region)
+# NaN — «грязные» варианты (MOSCOW, moscow, KAZAN...) + изначальные пропуски в city
+print("NaN в region_code:", df["region_code"].isna().sum())
+
+# 5. Даты
+df["signup_date"] = pd.to_datetime(df["signup_date"])
+df["signup_month"] = df["signup_date"].dt.month
+```
+
+</details>
 
 ➡️ Дальше: [B4. Группировки и агрегации](2_m04_groupby.md)

@@ -122,4 +122,4 @@ print(normalize_price(5))       # → 10
 
 🎯 **Мини-практика:** напиши функцию `is_adult(age)`, возвращающую True/False. Затем `calculate_conversion(visitors, buyers)`, возвращающую конверсию в процентах с округлением до 1 знака; защити её от деления на ноль (если visitors == 0, верни 0).
 
-➡️ Дальше: [1.9 Практика](1_9_practice.md)
+➡️ Дальше: [1.8b sorted + lambda](1_8b_sorted_lambda.md)

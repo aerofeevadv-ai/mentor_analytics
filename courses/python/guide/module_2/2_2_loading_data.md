@@ -4,6 +4,20 @@
 
 ---
 
+## Где взять датасеты курса
+
+Все практики модуля используют файлы из папки `datasets/csv/`. Основные файлы:
+
+| Файл | Строк | Что внутри |
+|---|---|---|
+| `data.csv` | 518 | пользователи: user_id, name, age, city, salary, email, segment, signup_date |
+| `orders.csv` | 5 100 | заказы: order_id, user_id, order_date, city, category, price, quantity, promo_code, status |
+| `users.csv` | 1 200 | пользователи с каналом: user_id, signup_date, segment, channel |
+
+Архив со всеми датасетами прилагается к курсу — ссылка на скачивание в [модуле 3](../module_3/00_index.md).
+
+---
+
 ## CSV — основной формат в обучении и обмене данными
 
 CSV — текстовый файл, значения разделены символом (запятая или точка с запятой).

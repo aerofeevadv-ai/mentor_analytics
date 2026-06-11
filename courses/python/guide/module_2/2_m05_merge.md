@@ -39,6 +39,20 @@ orders.merge(users, on="user_id", suffixes=("_order", "_user"))
 
 ---
 
+## validate — однострочная страховка от дублей
+
+Параметр `validate` проверяет кратность связи до слияния и падает с ошибкой, если реальность расходится с ожиданием:
+
+```python
+orders.merge(users, on="user_id", how="left", validate="many_to_one")
+# Упадёт, если в users окажутся дубли по user_id
+# Варианты: "one_to_one", "one_to_many", "many_to_one", "many_to_many"
+```
+
+Три лишние секунды при написании кода — экономия часа разбора «почему строк вдруг стало больше».
+
+---
+
 ## concat() — склейка таблиц
 
 **Что делает:** склеивает таблицы по вертикали (друг под друга) или горизонтали.
@@ -75,6 +89,28 @@ df_wide = pd.concat([df1, df2], axis=1)
 
 Перед merge: проверил дубли ключа в обеих таблицах. После merge: сверил shape с ожиданием и посчитал NaN в приклеенных колонках. Три лишние строки кода, которые экономят часы поиска «почему выручка выросла вдвое».
 
-🎯 **Практика:** даны таблицы orders (order_id, user_id, amount) и users (user_id, city). 1) Приклей город к заказам так, чтобы ни один заказ не потерялся; 2) посчитай, сколько заказов осталось без города; 3) намеренно задублируй одного user в users, повтори merge и объясни, что произошло с количеством строк.
+🎯 **Практика:** в датасетах курса есть `orders.csv` (order_id, user_id, order_date, city, category, price, quantity, promo_code, status) и `users.csv` (user_id, signup_date, segment, channel). 1) Приклей к заказам сегмент пользователя так, чтобы ни один заказ не потерялся; 2) посмотри, сколько заказов осталось без сегмента (user не найден в users) — используй `how="left"`; 3) добавь `validate="many_to_one"` — убедись, что ключ в users уникален; 4) намеренно добавь дубль одного user_id в users, повтори merge без validate и объясни, что произошло с количеством строк.
+
+<details>
+<summary>✅ Решение</summary>
+
+```python
+import pandas as pd
+orders = pd.read_csv("orders.csv")
+users  = pd.read_csv("users.csv")
+
+# 1-2. LEFT JOIN, не теряем заказы
+merged = orders.merge(users, on="user_id", how="left", validate="many_to_one")
+print("shape:", merged.shape)    # должно быть (5100, 12)
+print("без сегмента:", merged["segment"].isna().sum())
+
+# 3. validate держит честность ключа
+# 4. Демонстрация роста строк при дублях ключа
+users_with_dup = pd.concat([users, users.iloc[[0]]], ignore_index=True)
+merged_dup = orders.merge(users_with_dup, on="user_id", how="left")
+print("строк с дублём ключа:", merged_dup.shape[0])   # больше 5100!
+```
+
+</details>
 
 ➡️ Дальше: [B6. Пропуски](2_m06_missing.md)

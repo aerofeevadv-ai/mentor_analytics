@@ -1,6 +1,6 @@
 # 📎 4.5 Шпаргалка pandas ↔ SQL
 
-Полная таблица соответствий. Держи под рукой на собеседовании готовился — вопрос «перепиши SQL на pandas» встречается регулярно.
+Держи под рукой на собеседовании — вопрос «перепиши SQL на pandas» встречается регулярно.
 
 ---
 
@@ -9,7 +9,7 @@
 | SQL | pandas |
 |---|---|
 | `SELECT col1, col2` | `df[["col1", "col2"]]` |
-| `SELECT col AS new_name` | `df.rename(columns={"col": "new_name"})` |
+| `SELECT col AS new_name` | `df[["col"]].rename(columns={"col": "new_name"})` — rename переименовывает, но не выбирает колонки; чтобы получить только одну колонку под новым именем, нужно сначала выбрать её через `[[...]]`, а затем rename |
 | `WHERE age > 30` | `df[df["age"] > 30]` |
 | `WHERE a > 1 AND b < 5` | `df[(df["a"] > 1) & (df["b"] < 5)]` |
 | `WHERE city IN (...)` | `df[df["city"].isin([...])]` |
@@ -17,7 +17,7 @@
 | `WHERE name LIKE '%abc%'` | `df[df["name"].str.contains("abc", na=False)]` |
 | `WHERE x IS NULL` | `df[df["x"].isna()]` |
 | `WHERE x IS NOT NULL` | `df[df["x"].notna()]` |
-| `CASE WHEN ... THEN ...` | `np.where(cond, a, b)` / `apply` / `map` |
+| `CASE WHEN c1 THEN v1 WHEN c2 THEN v2 ELSE v3` | `np.select([c1, c2], [v1, v2], default=v3)` — для 2+ веток; `np.where(cond, a, b)` только для одной ветки |
 | `CAST(x AS INT)` | `df["x"].astype(int)` |
 | `COALESCE(x, 0)` | `df["x"].fillna(0)` |
 | `GROUP BY city` | `df.groupby("city")` |
@@ -35,6 +35,11 @@
 | `SELECT DISTINCT` | `df.drop_duplicates()` |
 | `ROW_NUMBER() OVER (PARTITION BY u ORDER BY d)` | `df.sort_values("d").groupby("u").cumcount() + 1` |
 | `SUM(x) OVER (PARTITION BY u)` | `df.groupby("u")["x"].transform("sum")` |
+| `LAG(x, 1) OVER (PARTITION BY u ORDER BY d)` | `df.sort_values("d").groupby("u")["x"].shift(1)` |
+| `LEAD(x, 1) OVER (PARTITION BY u ORDER BY d)` | `df.sort_values("d").groupby("u")["x"].shift(-1)` |
+| `RANK() OVER (ORDER BY x DESC)` | `df["x"].rank(method="min", ascending=False).astype(int)` |
+| `DENSE_RANK() OVER (ORDER BY x DESC)` | `df["x"].rank(method="dense", ascending=False).astype(int)` |
+| `AVG(x) OVER (ORDER BY d ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)` | `df.sort_values("d")["x"].rolling(window=3, min_periods=1).mean()` |
 
 ---
 

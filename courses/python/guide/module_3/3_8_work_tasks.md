@@ -22,20 +22,27 @@
 ```python
 import pandas as pd
 
-orders = pd.read_csv("orders.csv")
-orders["order_date"] = pd.to_datetime(orders["order_date"])
-orders = orders[orders["status"] == "completed"].dropna(subset=["user_id"])
-orders["order_month"] = orders["order_date"].dt.to_period("M")
+orders_raw = pd.read_csv("orders.csv")
+users = pd.read_csv("users.csv")
+orders_raw["order_date"] = pd.to_datetime(orders_raw["order_date"])
+
+# Чистка в самом начале — 60 дублей и 25 отрицательных цен попадут в метрики
+# если не убрать (модуль 3.3 объяснял почему это критично)
+orders_all = orders_raw.drop_duplicates().query("price > 0").copy()
+
+# orders1 — только completed заказы без пропуска user_id (для когортного анализа)
+orders1 = orders_all[orders_all["status"] == "completed"].dropna(subset=["user_id"]).copy()
+orders1["order_month"] = orders1["order_date"].dt.to_period("M")
 
 # 1. Когорта = месяц первого заказа
-first = orders.groupby("user_id")["order_month"].min().rename("cohort")
-orders = orders.merge(first, on="user_id")
+first = orders1.groupby("user_id")["order_month"].min().rename("cohort")
+orders1 = orders1.merge(first, on="user_id")
 
 # 2. Возраст заказа в месяцах
-orders["age"] = (orders["order_month"] - orders["cohort"]).apply(lambda x: x.n)
+orders1["age"] = (orders1["order_month"] - orders1["cohort"]).apply(lambda x: x.n)
 
 # 3. Уникальные пользователи: когорта × возраст
-cohort_users = (orders.groupby(["cohort", "age"])["user_id"]
+cohort_users = (orders1.groupby(["cohort", "age"])["user_id"]
                       .nunique().reset_index())
 
 table = cohort_users.pivot_table(index="cohort", columns="age",
@@ -47,6 +54,8 @@ retention
 ```
 
 **Как читать:** строка — когорта, колонка 1 — доля вернувшихся через месяц. Если по диагонали вниз ретеншн растёт — продукт улучшается.
+
+📌 **Проверь себя:** M1 первой когорты (2025-06) = **0.465** (46.5% вернулись на второй месяц).
 
 </details>
 
@@ -62,9 +71,11 @@ retention
 <summary>✅ Решение</summary>
 
 ```python
-total = len(orders_all)                                     # создано
-not_cancelled = (orders_all["status"] != "cancelled").sum() # не отменено
-completed = (orders_all["status"] == "completed").sum()     # завершено
+# orders_all определён в задаче 1 — все заказы после drop_duplicates + price > 0
+# воронка строится по ВСЕМ статусам, без фильтра по status
+total = len(orders_all)                                      # создано
+not_cancelled = (orders_all["status"] != "cancelled").sum()  # не отменено
+completed = (orders_all["status"] == "completed").sum()      # завершено
 
 funnel = pd.DataFrame({
     "step": ["created", "not_cancelled", "completed"],
@@ -76,6 +87,8 @@ funnel
 ```
 
 **Вывод формулируй так:** «теряем X% на отмене; сильнее всего проседает шаг такой-то — копать туда».
+
+📌 **Проверь себя:** created = **5 015**, конверсия created→not_cancelled = **87.5%**, not_cancelled→completed = **88.5%**.
 
 </details>
 
@@ -91,7 +104,8 @@ funnel
 <summary>✅ Решение</summary>
 
 ```python
-clean = orders[orders["status"] == "completed"].copy()
+# clean — completed заказы после чистки (orders_all из задачи 1)
+clean = orders_all[orders_all["status"] == "completed"].copy()
 clean["revenue"] = clean["price"] * clean["quantity"]
 
 rev = (clean.merge(users[["user_id", "segment"]], on="user_id", how="left")
@@ -111,6 +125,8 @@ rev.round(0)
 
 > ⚠️ **Ловушка:** знаменатель ARPU — все пользователи сегмента (таблица users), а не только те, кто есть в заказах. Посчитаешь от заказов — получишь ARPPU и завысишь метрику.
 
+📌 **Проверь себя:** ARPU сегмента new ≈ **26 673 ₽**, ARPPU new ≈ **47 765 ₽**, средний чек new ≈ **8 707 ₽**. VIP по ARPU выше new и regular — **29 685 ₽**.
+
 </details>
 
 ---
@@ -125,16 +141,24 @@ rev.round(0)
 <summary>✅ Решение</summary>
 
 ```python
-rev_table = orders.pivot_table(index="cohort", columns="age",
+# Добавляем cohort и age к clean (используем clean из задачи 3)
+clean["order_month"] = clean["order_date"].dt.to_period("M")
+first_ltv = clean.groupby("user_id")["order_date"].min()
+clean = clean.merge(first_ltv.dt.to_period("M").rename("cohort"), on="user_id")
+clean["age"] = (clean["order_month"] - clean["cohort"]).apply(lambda x: x.n)
+
+rev_table = clean.pivot_table(index="cohort", columns="age",
                                values="revenue", aggfunc="sum")
 
-cohort_size = orders.groupby("cohort")["user_id"].nunique()
+cohort_size = clean.groupby("cohort")["user_id"].nunique()
 ltv = rev_table.div(cohort_size, axis=0).round(0)
 
 # накопленная выручка на пользователя по месяцам жизни
 ltv_cum = ltv.cumsum(axis=1)
 ltv_cum
 ```
+
+📌 **Проверь себя:** накопленный LTV первой когорты (2025-06): M0 = **10 939 ₽**, M0+M1 = **16 371 ₽**, M0+M1+M2 = **21 191 ₽**.
 
 </details>
 
